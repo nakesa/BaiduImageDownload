@@ -3,10 +3,10 @@ import re
 import requests
 
 
-def dowmloadPic(html, keyword):
+def dowmloadPic(html, keyword, n):
     pic_url = re.findall('"objURL":"(.*?)",', html, re.S)
     i = 1
-    print('找到关键词:' + keyword + '的图片，现在开始下载图片...')
+    print('找到关键词:' + keyword + '的图片，现在开始下载第' + str(n) + '页图片...')
     for each in pic_url:
         print('正在下载第' + str(i) + '张图片，图片地址:' + str(each))
         try:
@@ -15,7 +15,7 @@ def dowmloadPic(html, keyword):
             print('【错误】当前图片无法下载')
             continue
 
-        dir = '../images/' + keyword + '_' + str(i) + '.jpg'
+        dir = '../images/' + keyword + '_' + str(n) + '_' + str(i) + '.jpg'
         fp = open(dir, 'wb')
         fp.write(pic.content)
         fp.close()
@@ -24,6 +24,13 @@ def dowmloadPic(html, keyword):
 
 if __name__ == '__main__':
     word = input("Input key word: ")
-    url = 'http://image.baidu.com/search/flip?tn=baiduimage&ie=utf-8&word=' + word + '&ct=201326592&v=flip'
-    result = requests.get(url)
-    dowmloadPic(result.text, word)
+    page = int(input("Input key page："))
+    n = 1
+    pageSize = 20
+    pn = 0
+    while n <= page:
+        pn = n * pageSize
+        url = 'http://image.baidu.com/search/flip?tn=baiduimage&ie=utf-8&word=' + word + '&ct=201326592&v=flip&pn=' + str(pn)
+        result = requests.get(url)
+        dowmloadPic(result.text, word, n)
+        n = n + 1
